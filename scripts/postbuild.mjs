@@ -13,7 +13,13 @@ function gitValue(command, fallback) {
 }
 
 const version = process.env.npm_package_version ?? '0.1.0';
-const commit = process.env.APP_COMMIT ?? gitValue('git rev-parse --short HEAD', 'local');
+const commit =
+  process.env.APP_COMMIT ?? gitValue("git log -1 --format=%h -- . ':(exclude)docs'", 'local');
+const builtAt =
+  process.env.APP_BUILD_DATE ??
+  (commit === 'local'
+    ? new Date().toISOString()
+    : gitValue(`git show -s --format=%cI ${commit}`, new Date().toISOString()));
 
 writeFileSync(
   'docs/version.json',
@@ -21,7 +27,7 @@ writeFileSync(
     {
       version,
       commit,
-      builtAt: new Date().toISOString(),
+      builtAt,
       repository: 'https://github.com/baditaflorin/crystal-growth-simulator'
     },
     null,

@@ -14,8 +14,13 @@ function gitValue(command: string, fallback: string) {
   }
 }
 
-const commit = process.env.APP_COMMIT ?? gitValue('git rev-parse --short HEAD', 'local');
-const buildDate = new Date().toISOString();
+const commit =
+  process.env.APP_COMMIT ?? gitValue("git log -1 --format=%h -- . ':(exclude)docs'", 'local');
+const buildDate =
+  process.env.APP_BUILD_DATE ??
+  (commit === 'local'
+    ? new Date().toISOString()
+    : gitValue(`git show -s --format=%cI ${commit}`, new Date().toISOString()));
 
 export default defineConfig({
   base: `/${repoName}/`,
