@@ -8,6 +8,7 @@ const generatedPaths = [
   'docs/404.html',
   'docs/registerSW.js',
   'docs/sw.js',
+  'docs/sw.js.map',
   'docs/manifest.webmanifest',
   'docs/version.json'
 ];
@@ -18,7 +19,7 @@ for (const target of generatedPaths) {
 
 try {
   for (const entry of readdirSync('docs')) {
-    if (entry.startsWith('workbox-') && entry.endsWith('.js')) {
+    if (entry.startsWith('workbox-') && (entry.endsWith('.js') || entry.endsWith('.js.map'))) {
       rmSync(join('docs', entry), { force: true });
     }
   }

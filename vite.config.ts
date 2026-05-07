@@ -55,6 +55,7 @@ export default defineConfig({
         ]
       },
       workbox: {
+        sourcemap: false,
         globPatterns: ['**/*.{js,css,html,svg,png,json,webmanifest,wasm}'],
         navigateFallback: '/crystal-growth-simulator/index.html',
         runtimeCaching: [
