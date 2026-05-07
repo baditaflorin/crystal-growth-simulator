@@ -1,0 +1,38 @@
+# OS and editors
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# Secrets
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Logs and temp files
+*.log
+tmp/
+.tmp/
+
+# Node
+node_modules/
+coverage/
+.vite/
+test-results/
+playwright-report/
+
+# Go and Python
+bin/
+*.test
+__pycache__/
+.pytest_cache/
+.venv/
+venv/
+
+# Build output not used for GitHub Pages
+dist/
+dist-data/
+
+# Keep docs/ tracked: GitHub Pages publishes from main:/docs.

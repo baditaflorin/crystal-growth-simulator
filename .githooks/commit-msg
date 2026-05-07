@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+MSG_FILE="${1:-}"
+if [ -z "$MSG_FILE" ] || [ ! -f "$MSG_FILE" ]; then
+  echo "commit-msg hook requires a commit message file"
+  exit 1
+fi
+
+FIRST_LINE="$(head -n 1 "$MSG_FILE")"
+if ! printf "%s" "$FIRST_LINE" | grep -Eq '^(feat|fix|docs|chore|refactor|test|ops|data)(\([a-z0-9._-]+\))?: .{1,120}$'; then
+  echo "Commit message must use Conventional Commits, e.g. feat: add simulator"
+  exit 1
+fi
