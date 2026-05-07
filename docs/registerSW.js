@@ -1,0 +1,1 @@
+if('serviceWorker' in navigator) {window.addEventListener('load', () => {navigator.serviceWorker.register('/crystal-growth-simulator/sw.js', { scope: '/crystal-growth-simulator/' })})}
