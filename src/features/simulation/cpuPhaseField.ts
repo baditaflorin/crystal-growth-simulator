@@ -58,7 +58,18 @@ export class CpuPhaseFieldEngine implements SimulationEngine {
         const anisotropy = 1 + settings.anisotropy * Math.cos(settings.symmetry * angle);
         const front = phase * (1 - phase);
         const drive = phase - 0.5 + settings.undercooling + (nutrient - 0.52) * 0.72;
-        const stochastic = (hashNoise(x, y, this.frame) - 0.5) * settings.noise * (1 - phase);
+        // Gate the stochastic term by `front` (zero everywhere phase is exactly
+        // 0 or 1), not by `(1 - phase)` (nonzero across the *entire* untouched
+        // background). With typical undercooling/nutrient values the reaction
+        // term `front * drive` is a positive feedback once phase is nudged
+        // above 0 (background is a linearly unstable fixed point, not a
+        // metastable liquid), so perturbing the whole grid every frame — as
+        // `(1 - phase)` did — spontaneously nucleates solid everywhere at
+        // once after only ~20-25 steps instead of growing outward from the
+        // seed. Gating by `front` keeps the perturbation confined to cells
+        // that are already part of the solid-liquid interface, which is the
+        // only place noise should be roughening the growth front.
+        const stochastic = (hashNoise(x, y, this.frame) - 0.5) * settings.noise * front;
         const delta =
           settings.dt * settings.mobility * (anisotropy * lapPhase + front * drive + stochastic);
         const nextPhase = clamp01(phase + delta);
