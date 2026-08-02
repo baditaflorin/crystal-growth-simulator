@@ -119,7 +119,13 @@ fn main(@builtin(global_invocation_id) id: vec3<u32>) {
   let anis = 1.0 + params.anisotropy * cos(params.symmetry * angle);
   let front = phase * (1.0 - phase);
   let drive = phase - 0.5 + params.undercooling + (nutrient - 0.52) * 0.72;
-  let stochastic = (hashNoise(f32(x), f32(y), params.time) - 0.5) * params.noise * (1.0 - phase);
+  // Gate noise by \`front\` (zero in untouched background), not \`(1 - phase)\`
+  // (nonzero everywhere) — see the matching comment in cpuPhaseField.ts. Using
+  // \`(1 - phase)\` perturbs the entire grid every frame, and since bulk liquid
+  // is a linearly unstable fixed point of \`front * drive\` at these
+  // undercooling/nutrient values, that spontaneously nucleates solid across
+  // the whole domain within ~20-25 steps instead of growing from the seed.
+  let stochastic = (hashNoise(f32(x), f32(y), params.time) - 0.5) * params.noise * front;
   let delta = params.dt * params.mobility * (anis * lapPhase + front * drive + stochastic);
   let nextPhase = clamp(phase + delta, 0.0, 1.0);
   let growth = max(0.0, nextPhase - phase);
